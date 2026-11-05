@@ -1,133 +1,77 @@
-# cs32 --> Term Project
-## Contributors
-Developed by Zeeshan Bhalwani (zbhalwan) & Kyle Sohn (ksohn3) & Safae Merigh (smerigh) & Omer Chaudhry (mchaud11)
+# Sneaker Bargains
 
-Total time this week: 10 hours 
+**Find the best price for any sneaker, across every resale platform, in one search.**
 
-Github Repo: https://github.com/cs0320-s2023/commerce-project.git
+Sneaker Bargains is a full-stack web app that pulls live resale listings for a sneaker from multiple platforms and shows them side by side, so you can see the price range at a glance and save the shoes you're watching.
 
+Built by a team of 4 as a software engineering term project.
 
-## Project Description
+---
 
-## Contributions
+## Features
 
-Kyle:
-* Styling with bootstrap:
-  * Cards (pictures with shoes)
-  * Alerts (worked on alerts to replace divs)
-  * Toggle buttons (all toggle buttons appeared on the website)
-* Frontend work with components - added roles and adjusted code after 
-* Running tests
-  * All of DOM testing - tested all the components possible including components that only appear after firing a click
-  * Half of unit testing - tested around half of the getters in the data folder
+- **Search any sneaker** and get matching products with images, colorways and SKUs
+- **Filter by platform** to compare only the resale sites you care about
+- **Price comparison** across platforms, with a visual price range for each shoe
+- **Google sign-in and saved wishlist** (Firebase), so your watchlist follows you
+- **Keyboard accessible**, with ARIA roles and shortcuts throughout
+- **Mock mode** that runs the whole app on saved sample data, with no API key needed
 
-Zeeshan: 
-* Google authentification with firebase
-* Wishlist functionality (panel, adding/removing products)
-* Wishlist and Sign In/Out frontend
-* Connecting wishlist and user accounts to database
-* Accessibility + shortcuts
-* Setting up and creating initial handler for backend mock api server 
-* Defensive Programming throughout the project
+## How it works
 
-Omer:
-* Front end:
-  * Dom & unit testing
-  * Assistance with google authentification with firebase
+```
+React + TypeScript frontend  ──►  Java REST API (Spark)  ──►  Sneaker pricing API
+         │                              │
+     Firebase                    Guava cache layer
+ (sign-in, wishlist)          (avoids repeat API calls)
+```
 
-* Backend: 
-  * Setting up and creating initial handler for backend mock api server 
+- **Frontend:** React and TypeScript (Vite), styled with Bootstrap, Material UI and Ant Design. State is managed with a reducer, and type guards validate every server response.
+- **Backend:** a Java server built with Spark that exposes three endpoints. Each one goes through a caching proxy (Guava), so repeat searches don't hit the paid API again.
+- **Data:** live listings from a real-time sneaker pricing API (RapidAPI), or saved JSON responses in mock mode.
 
-Safae: 
-* Frontend : 
-  * Creation & styling of components:
-    * Search Bar
-    * Platforms filtering
-    * Search Results
-    * Product price Statistics
-    * Error Message
-  * Implementation of functionalities (in data folder):
-    * Interfaces to manage different data types
-    * Retrieving of platforms (from mock data & from API)
-    * Retrieving products from user search (from mock data & from API)
-    * Retrieving prices for each product (from mock data & from API)
+### API endpoints (`localhost:3232`)
 
-* Backend:
-    * Creating and implementation of final handlers for back end SneakerPlatformHandler, SneakerPriceStatsHandler, SneakerProductList 
-      --> with mocking & making API calls
-    * Created and implemented caching (all the HTTP and Proxy files)
+| Endpoint | Returns |
+|---|---|
+| `GET /sneakers?query=...` | Products matching a search |
+| `GET /platforms` | Resale platforms available for filtering |
+| `GET /price_stats?sku=...` | A sneaker's prices across platforms |
 
-## Backend
-In the `src` package is `main` and `test`:
-* `java` 
+---
 
-  * _SneakerSKUHandler.java_ : handles the request for the SKU and Image URL of a sneaker from its name (not used)
-  * _SneakerPriceHandler.java_ : handles the request for the price of a sneaker from its SKU (not used)
+## Run it locally
 
-  * _SneakerPlatformsHandler.java_ : handles the request for platforms
-  * _SneakerPriceStatsHandler.java_ : handles the request for prices
-  * _SneakerProductListsHandler.java_ : handles the request for product shoes after search
+**Backend** (Java 17+, Maven)
+```bash
+cd backend
+mvn package
+# then run server.Server (starts on port 3232)
+```
 
-    * HTTP
-      * PlatformsHTTP & PriceStatsHTTP & ProductListHTTP : calling API 
-      * PlatformsProxy & PriceStatsProxy & ProductListProxy : Caching
+**Frontend** (Node 18+)
+```bash
+cd frontend
+npm install
+npm run dev
+```
 
-* `test` and its subdirectories contains unit testing, fuzz testing, integration testing, and testing with mocks.
+Mock mode is on by default (`frontend/src/data/mockingMode.ts`), so the app works without any API keys. For live data, add your own RapidAPI key and Firebase config to the backend and frontend config files.
 
+## Testing
 
-### API Endpoints
-* Paid API will use: https://rapidapi.com/letscrape-6bRBa3QguO5/api/real-time-product-search/
-MOCK API:
-  * GET /sneaker/sku?name={name} : returns the SKU and Image URL of a sneaker from its name
-  * GET /sneaker/price?sku={sku} : returns the price of a sneaker from its SKU
+- **Frontend:** DOM tests for every component (including ones that only appear after user actions) and unit tests for the data layer, using React Testing Library
+- **Backend:** JUnit tests for JSON parsing and serialization, plus integration tests against the mock server
 
-## Frontend
-* `frontend` contains code for rendering the website
+```bash
+cd frontend && npm test
+cd backend && mvn test
+```
 
-* `src` directory contains `data`, `components`, `tests` directories and `App.tsx`
+## Tech stack
 
-  * _App.tsx_ : entry point of the webpage, where all the necessary components are rendered.
+React · TypeScript · Vite · Bootstrap · Material UI · Ant Design · Java · Spark · Guava · Moshi · Firebase · React Testing Library · JUnit
 
-  * `mockdata` directory contains mock data 
-    * _platforms.ts_ : provides a list of the different sneakers
-    * _search.ts_ : provides a list of the different sneakers´ information (platforms, sku, image, color...) when looking up "Adidas"
-    * _priceStats.ts_ : provides a list of the different sneakers´ prices on different platforms when looking up "Adidas"
+## Team
 
-  * `components` directory contains all the components that appear on the webpage: SearchBar, ProductDescription, SearchResults, Filter, Wishlist, & Google SignIn button
-
-    * _SearchBar.tsx_: where the user can type the product he is looking for. 
-    * _GoogleSignIn.tsx_ : let's the user sign in via their email address
-    * _Filter.tsx_ : let's the user restrain the search to its selected platforms
-    * _SearchResults.tsx_ : shows all the vendors selling the selected product 
-      * _ProdcutPriceStats.tsx_ : shows the product description. Includes: picture + name + prices (accross all selected platforms + sidebar to visualze price range)
-      * _Wishlist.tsx_ : shows the products the user has liked
-  
-  * `data`: where the functionnality is implemented
-    * _dataTypes.ts_ : lists all the interfaces that represent data types used througout the project
-    * _getPlatforms.ts_ : retrieves the platforms of a given shoe 
-    * _getPriceStats.ts_  : retrieves the prices on all platforms of a given shoe 
-    * _getProductList.ts_  : retrieves the products corresponding to a search by the user 
-    * _getWishlist.ts_ :  retrieves the products the user has liked
-    * _mockingMde.ts_ : whether we are mocking or making calls to the API
-    * _reducer.ts_: handles the global state of the different components
-    * _typePredicate.ts_ : has type guard functions for checking if given object is a ServerErrorResponse or isServerSuccessResponse
-
-  * `tests` directory contains tests for the forntend 
-    * _dom.test.tsx_: contains the DOM testing for the webapp
-    * _unit.test.tsx_ : contains the unit testing for the webapp
-
-
-## Errors and Bugs 
-
-## Running the Program
-
-* in folder H
-* cd into backend --> src --> main --> server and run `Server.java`
-  * go to `localhost:3232` and utilize API endpoints and parameters detailed in the API section of README.
-
-* cd into frontend and run first `npm install` and then `npm start`, `npm run dev`, `npm install firebase`, `npm install @mui/material`, `npm install @emotion/styled`
-
-* Run `Server.main()` and go to `localhost:3232` and utilize API endpoints and parameters detailed in the API section.
-
-* Run the tests: `npm test` for frontend and `mvn test`
-  * run the server before running integration tests
+Zeeshan Bhalwani · Omer Chaudhry · Safae Merigh · Kyle Sohn
